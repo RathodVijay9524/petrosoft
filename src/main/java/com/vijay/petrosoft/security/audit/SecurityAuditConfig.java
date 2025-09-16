@@ -99,9 +99,9 @@ public class SecurityAuditConfig {
     }
 
     /**
-     * Scheduled security monitoring
+     * Scheduled security monitoring - DISABLED for startup performance
      */
-    @Scheduled(fixedRate = 60000) // Every minute
+    // @Scheduled(fixedRate = 60000) // DISABLED - Only run when explicitly enabled
     public void monitorSecurity() {
         try {
             int totalLogins = successfulLogins.get() + failedLoginAttempts.get();

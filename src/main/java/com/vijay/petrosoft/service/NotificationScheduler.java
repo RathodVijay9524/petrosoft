@@ -12,7 +12,7 @@ public class NotificationScheduler {
 
     private final NotificationService notificationService;
 
-    @Scheduled(fixedDelay = 30000) // Run every 30 seconds
+    // @Scheduled(fixedDelay = 30000) // DISABLED for startup performance
     public void processPendingNotifications() {
         try {
             log.debug("Processing pending notifications...");
@@ -22,7 +22,7 @@ public class NotificationScheduler {
         }
     }
 
-    @Scheduled(fixedDelay = 60000) // Run every minute
+    // @Scheduled(fixedDelay = 60000) // DISABLED for startup performance
     public void processFailedNotifications() {
         try {
             log.debug("Processing failed notifications for retry...");

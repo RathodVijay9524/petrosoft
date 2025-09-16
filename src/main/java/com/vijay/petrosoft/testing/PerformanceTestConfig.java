@@ -85,9 +85,9 @@ public class PerformanceTestConfig {
     }
 
     /**
-     * Scheduled performance monitoring
+     * Scheduled performance monitoring - DISABLED for startup performance
      */
-    @Scheduled(fixedRate = 30000) // Every 30 seconds
+    // @Scheduled(fixedRate = 30000) // DISABLED - Only run when explicitly enabled
     public void monitorPerformance() {
         try {
             double errorRate = totalRequests.get() > 0 ? 

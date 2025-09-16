@@ -24,22 +24,22 @@ import java.util.Arrays;
 public class LoggingAspect {
     
     /**
-     * Pointcut for all service methods
+     * Pointcut for service methods - OPTIMIZED: Only public methods
      */
-    @Pointcut("execution(* com.vijay.petrosoft.service..*(..))")
+    @Pointcut("execution(public * com.vijay.petrosoft.service..*(..))")
     public void serviceMethods() {}
     
     /**
-     * Pointcut for all controller methods
+     * Pointcut for controller methods - OPTIMIZED: Only public methods
      */
-    @Pointcut("execution(* com.vijay.petrosoft.controller..*(..))")
+    @Pointcut("execution(public * com.vijay.petrosoft.controller..*(..))")
     public void controllerMethods() {}
     
     /**
-     * Pointcut for all repository methods
+     * Pointcut for repository methods - DISABLED for performance
      */
-    @Pointcut("execution(* com.vijay.petrosoft.repository..*(..))")
-    public void repositoryMethods() {}
+    // @Pointcut("execution(* com.vijay.petrosoft.repository..*(..))")
+    // public void repositoryMethods() {}
     
     /**
      * Around advice for service methods
@@ -58,75 +58,44 @@ public class LoggingAspect {
     }
     
     /**
-     * Around advice for repository methods
+     * Around advice for repository methods - DISABLED for performance
      */
-    @Around("repositoryMethods()")
-    public Object logRepositoryMethods(ProceedingJoinPoint joinPoint) throws Throwable {
-        return logMethodExecution(joinPoint, "REPOSITORY");
-    }
+    // @Around("repositoryMethods()")
+    // public Object logRepositoryMethods(ProceedingJoinPoint joinPoint) throws Throwable {
+    //     return logMethodExecution(joinPoint, "REPOSITORY");
+    // }
     
     /**
-     * Common method execution logging logic
+     * Common method execution logging logic - OPTIMIZED FOR PERFORMANCE
      */
     private Object logMethodExecution(ProceedingJoinPoint joinPoint, String layer) throws Throwable {
         String methodName = joinPoint.getSignature().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String fullMethodName = className + "." + methodName;
         
-        // Set MDC for structured logging
-        MDC.put("layer", layer);
-        MDC.put("className", className);
-        MDC.put("methodName", methodName);
-        MDC.put("timestamp", LocalDateTime.now().toString());
-        
-        // Add HTTP context if available
-        addHttpContext();
-        
         long startTime = System.currentTimeMillis();
         
         try {
-            // Log method entry with parameters
-            Object[] args = joinPoint.getArgs();
-            if (args != null && args.length > 0) {
-                MDC.put("parameters", Arrays.toString(args));
-                log.debug("Entering {} method: {} with parameters: {}", layer, fullMethodName, Arrays.toString(args));
-            } else {
-                log.debug("Entering {} method: {}", layer, fullMethodName);
-            }
-            
             // Execute the method
             Object result = joinPoint.proceed();
             
-            // Log method exit with execution time
+            // Log method exit with execution time - ONLY for slow methods
             long executionTime = System.currentTimeMillis() - startTime;
-            MDC.put("executionTimeMs", String.valueOf(executionTime));
-            MDC.put("status", "SUCCESS");
             
-            if (executionTime > 5000) {
+            if (executionTime > 1000) {  // Only log methods taking > 1 second
                 log.warn("SLOW {} method: {} completed in {}ms", layer, fullMethodName, executionTime);
-            } else if (executionTime > 1000) {
-                log.info("{} method: {} completed in {}ms", layer, fullMethodName, executionTime);
-            } else {
-                log.debug("{} method: {} completed in {}ms", layer, fullMethodName, executionTime);
             }
             
             return result;
             
         } catch (Exception e) {
-            // Log method exception
+            // Log method exception - ONLY errors
             long executionTime = System.currentTimeMillis() - startTime;
-            MDC.put("executionTimeMs", String.valueOf(executionTime));
-            MDC.put("status", "ERROR");
-            MDC.put("error", e.getClass().getSimpleName());
-            MDC.put("errorMessage", e.getMessage());
-            
-            log.error("ERROR in {} method: {} after {}ms - {}", layer, fullMethodName, executionTime, e.getMessage(), e);
+            log.error("ERROR in {} method: {} after {}ms - {}", layer, fullMethodName, executionTime, e.getMessage());
             
             throw e;
-        } finally {
-            // Clear MDC
-            MDC.clear();
         }
+        // Removed MDC operations for performance
     }
     
     /**
