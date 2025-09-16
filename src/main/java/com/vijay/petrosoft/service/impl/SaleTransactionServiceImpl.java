@@ -26,12 +26,25 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
     public SaleTransactionDTO createSale(SaleTransactionDTO saleDTO) {
         SaleTransaction sale = SaleTransaction.builder()
                 .pumpId(saleDTO.getPumpId())
+                .saleNumber(saleDTO.getSaleNumber())
                 .quantity(saleDTO.getQuantity())
                 .rate(saleDTO.getRate())
                 .amount(saleDTO.getAmount())
-                .creditSale(saleDTO.isCreditSale())
-                .customerId(saleDTO.getCustomerId())
+                .discountAmount(saleDTO.getDiscountAmount())
+                .taxAmount(saleDTO.getTaxAmount())
+                .totalAmount(saleDTO.getTotalAmount())
+                .paymentMethod(saleDTO.getPaymentMethod())
+                .saleType(saleDTO.getSaleType())
+                .status(saleDTO.getStatus())
                 .transactedAt(saleDTO.getTransactedAt() != null ? saleDTO.getTransactedAt() : LocalDateTime.now())
+                .operatorId(saleDTO.getOperatorId())
+                .cashierId(saleDTO.getCashierId())
+                .vehicleNumber(saleDTO.getVehicleNumber())
+                .driverName(saleDTO.getDriverName())
+                .notes(saleDTO.getNotes())
+                .cardLastFour(saleDTO.getCardLastFour())
+                .cardType(saleDTO.getCardType())
+                .transactionReference(saleDTO.getTransactionReference())
                 .build();
 
         SaleTransaction savedSale = saleRepository.save(sale);
@@ -44,12 +57,25 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
                 .orElseThrow(() -> new RuntimeException("Sale transaction not found with id: " + id));
 
         sale.setPumpId(saleDTO.getPumpId());
+        sale.setSaleNumber(saleDTO.getSaleNumber());
         sale.setQuantity(saleDTO.getQuantity());
         sale.setRate(saleDTO.getRate());
         sale.setAmount(saleDTO.getAmount());
-        sale.setCreditSale(saleDTO.isCreditSale());
-        sale.setCustomerId(saleDTO.getCustomerId());
+        sale.setDiscountAmount(saleDTO.getDiscountAmount());
+        sale.setTaxAmount(saleDTO.getTaxAmount());
+        sale.setTotalAmount(saleDTO.getTotalAmount());
+        sale.setPaymentMethod(saleDTO.getPaymentMethod());
+        sale.setSaleType(saleDTO.getSaleType());
+        sale.setStatus(saleDTO.getStatus());
         sale.setTransactedAt(saleDTO.getTransactedAt());
+        sale.setOperatorId(saleDTO.getOperatorId());
+        sale.setCashierId(saleDTO.getCashierId());
+        sale.setVehicleNumber(saleDTO.getVehicleNumber());
+        sale.setDriverName(saleDTO.getDriverName());
+        sale.setNotes(saleDTO.getNotes());
+        sale.setCardLastFour(saleDTO.getCardLastFour());
+        sale.setCardType(saleDTO.getCardType());
+        sale.setTransactionReference(saleDTO.getTransactionReference());
 
         SaleTransaction updatedSale = saleRepository.save(sale);
         return convertToDTO(updatedSale);
@@ -80,7 +106,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
     @Override
     @Transactional(readOnly = true)
     public List<SaleTransactionDTO> getSalesByPumpId(Long pumpId) {
-        return saleRepository.findByPumpId(pumpId).stream()
+        return saleRepository.findByPumpIdOrderByTransactedAtDesc(pumpId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -99,7 +125,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
     public List<SaleTransactionDTO> getSalesByDateRange(LocalDate startDate, LocalDate endDate) {
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
-        return saleRepository.findByTransactedAtBetween(startDateTime, endDateTime).stream()
+        return saleRepository.findByTransactedAtBetweenOrderByTransactedAtDesc(startDateTime, endDateTime).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -107,7 +133,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
     @Override
     @Transactional(readOnly = true)
     public List<SaleTransactionDTO> getSalesByCustomerId(Long customerId) {
-        return saleRepository.findByCustomerId(customerId).stream()
+        return saleRepository.findByCustomerIdOrderByTransactedAtDesc(customerId).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -115,7 +141,8 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
     @Override
     @Transactional(readOnly = true)
     public List<SaleTransactionDTO> getCreditSales() {
-        return saleRepository.findByCreditSaleTrue().stream()
+        return saleRepository.findAll().stream()
+                .filter(sale -> SaleTransaction.PaymentMethod.CREDIT.equals(sale.getPaymentMethod()))
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -123,7 +150,8 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
     @Override
     @Transactional(readOnly = true)
     public List<SaleTransactionDTO> getCashSales() {
-        return saleRepository.findByCreditSaleFalse().stream()
+        return saleRepository.findAll().stream()
+                .filter(sale -> SaleTransaction.PaymentMethod.CASH.equals(sale.getPaymentMethod()))
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -133,7 +161,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
     public BigDecimal getTotalSalesByDate(LocalDate date) {
         LocalDateTime startDateTime = date.atStartOfDay();
         LocalDateTime endDateTime = date.atTime(23, 59, 59);
-        return saleRepository.findByTransactedAtBetween(startDateTime, endDateTime).stream()
+        return saleRepository.findByTransactedAtBetweenOrderByTransactedAtDesc(startDateTime, endDateTime).stream()
                 .map(SaleTransaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -155,7 +183,7 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
                 .nozzleId(nozzleId)
                 .quantity(quantity)
                 .customerId(customerId)
-                .creditSale(isCredit)
+                .paymentMethod(isCredit ? SaleTransaction.PaymentMethod.CREDIT : SaleTransaction.PaymentMethod.CASH)
                 .transactedAt(LocalDateTime.now())
                 .build();
 
@@ -169,12 +197,26 @@ public class SaleTransactionServiceImpl implements SaleTransactionService {
                 .shiftId(sale.getShift() != null ? sale.getShift().getId() : null)
                 .nozzleId(sale.getNozzle() != null ? sale.getNozzle().getId() : null)
                 .fuelTypeId(sale.getFuelType() != null ? sale.getFuelType().getId() : null)
+                .customerId(sale.getCustomer() != null ? sale.getCustomer().getId() : null)
+                .saleNumber(sale.getSaleNumber())
                 .quantity(sale.getQuantity())
                 .rate(sale.getRate())
                 .amount(sale.getAmount())
-                .creditSale(sale.isCreditSale())
-                .customerId(sale.getCustomerId())
+                .discountAmount(sale.getDiscountAmount())
+                .taxAmount(sale.getTaxAmount())
+                .totalAmount(sale.getTotalAmount())
+                .paymentMethod(sale.getPaymentMethod())
+                .saleType(sale.getSaleType())
+                .status(sale.getStatus())
                 .transactedAt(sale.getTransactedAt())
+                .operatorId(sale.getOperatorId())
+                .cashierId(sale.getCashierId())
+                .vehicleNumber(sale.getVehicleNumber())
+                .driverName(sale.getDriverName())
+                .notes(sale.getNotes())
+                .cardLastFour(sale.getCardLastFour())
+                .cardType(sale.getCardType())
+                .transactionReference(sale.getTransactionReference())
                 .build();
     }
 }

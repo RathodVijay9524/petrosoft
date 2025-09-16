@@ -83,7 +83,7 @@ public class ShiftServiceImpl implements ShiftService {
                 .pumpId(pumpId)
                 .operatorId(operatorId)
                 .openedAt(LocalDateTime.now())
-                .status("ACTIVE")
+                .status(Shift.Status.OPEN)
                 .build();
 
         Shift savedShift = shiftRepository.save(shift);
@@ -95,12 +95,12 @@ public class ShiftServiceImpl implements ShiftService {
         Shift shift = shiftRepository.findById(shiftId)
                 .orElseThrow(() -> new RuntimeException("Shift not found with id: " + shiftId));
 
-        if (!"ACTIVE".equals(shift.getStatus())) {
-            throw new RuntimeException("Cannot close a shift that is not active");
+        if (shift.getStatus() != Shift.Status.OPEN) {
+            throw new RuntimeException("Cannot close a shift that is not open");
         }
 
         shift.setClosedAt(LocalDateTime.now());
-        shift.setStatus("CLOSED");
+        shift.setStatus(Shift.Status.CLOSED);
 
         Shift updatedShift = shiftRepository.save(shift);
         return convertToDTO(updatedShift);

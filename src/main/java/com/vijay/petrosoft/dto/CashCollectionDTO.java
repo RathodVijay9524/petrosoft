@@ -1,6 +1,6 @@
 package com.vijay.petrosoft.dto;
 
-import com.vijay.petrosoft.domain.Shift;
+import com.vijay.petrosoft.domain.CashCollection;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -11,28 +11,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ShiftDTO {
+public class CashCollectionDTO {
 
     private Long id;
 
     @NotNull(message = "Pump ID is required")
     private Long pumpId;
 
-    @NotNull(message = "Operator ID is required")
-    private Long operatorId;
+    @NotNull(message = "Shift ID is required")
+    private Long shiftId;
 
+    @NotNull(message = "Cashier ID is required")
     private Long cashierId;
 
-    @NotNull(message = "Shift name is required")
-    private String shiftName;
-
-    @NotNull(message = "Opened at is required")
-    private LocalDateTime openedAt;
-
-    private LocalDateTime closedAt;
-
-    @NotNull(message = "Status is required")
-    private Shift.Status status;
+    @NotNull(message = "Collection date is required")
+    private LocalDateTime collectionDate;
 
     private BigDecimal openingCash;
     private BigDecimal closingCash;
@@ -41,18 +34,26 @@ public class ShiftDTO {
     private BigDecimal cardSales;
     private BigDecimal creditSales;
     private BigDecimal cashCollected;
+    private BigDecimal cashShortage;
+    private BigDecimal cashExcess;
+    private BigDecimal notesTotal;
+    private BigDecimal coinsTotal;
     private BigDecimal cashGivenToNextShift;
     private BigDecimal balanceWithShiftIncharge;
     private BigDecimal balanceWithCashier;
+
+    @NotNull(message = "Status is required")
+    private CashCollection.Status status;
+
+    private Long collectedBy;
+    private Long verifiedBy;
+    private LocalDateTime verifiedAt;
     private String notes;
-    private Long closedBy;
 
     // Additional fields for UI
     private String pumpName;
-    private String operatorName;
+    private String shiftName;
     private String cashierName;
-    private String closedByName;
-
-    // Duration in hours
-    private Long durationHours;
+    private String collectedByName;
+    private String verifiedByName;
 }
