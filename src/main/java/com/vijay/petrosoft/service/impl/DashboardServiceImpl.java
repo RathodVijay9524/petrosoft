@@ -473,4 +473,82 @@ public class DashboardServiceImpl implements DashboardService {
         distribution.put("10000+", (long) (Math.random() * 5));
         return distribution;
     }
+
+    @Override
+    public Map<String, Object> getOverview() {
+        Map<String, Object> overview = new HashMap<>();
+        overview.put("totalPumps", pumpRepository.count());
+        overview.put("totalCustomers", customerRepository.count());
+        overview.put("totalSales", saleRepository.count());
+        overview.put("totalRevenue", getTotalRevenue(null));
+        overview.put("activeSubscriptions", subscriptionRepository.countActiveSubscriptions());
+        overview.put("totalPayments", paymentRepository.count());
+        overview.put("lastUpdated", LocalDateTime.now());
+        return overview;
+    }
+
+    @Override
+    public Map<String, Object> getMetrics() {
+        Map<String, Object> metrics = new HashMap<>();
+        metrics.put("pumpMetrics", Map.of(
+            "total", pumpRepository.count(),
+            "active", pumpRepository.count() // Assuming all are active
+        ));
+        metrics.put("customerMetrics", Map.of(
+            "total", customerRepository.count(),
+            "active", customerRepository.count()
+        ));
+        metrics.put("salesMetrics", Map.of(
+            "total", saleRepository.count(),
+            "today", getTodaySales(null),
+            "thisWeek", getThisWeekSales(null),
+            "thisMonth", getThisMonthSales(null)
+        ));
+        metrics.put("paymentMetrics", Map.of(
+            "total", paymentRepository.count(),
+            "totalAmount", getTotalPaymentAmount()
+        ));
+        return metrics;
+    }
+
+    @Override
+    public Map<String, Object> getKPIs() {
+        Map<String, Object> kpis = new HashMap<>();
+        kpis.put("revenueKPI", Map.of(
+            "daily", getTodaySales(null),
+            "weekly", getThisWeekSales(null),
+            "monthly", getThisMonthSales(null)
+        ));
+        kpis.put("customerKPI", Map.of(
+            "totalCustomers", customerRepository.count(),
+            "newCustomersThisMonth", getNewCustomersThisMonth(),
+            "customerRetentionRate", getCustomerRetentionRate()
+        ));
+        kpis.put("operationalKPI", Map.of(
+            "totalPumps", pumpRepository.count(),
+            "activeSubscriptions", subscriptionRepository.countActiveSubscriptions(),
+            "paymentSuccessRate", getPaymentSuccessRate()
+        ));
+        return kpis;
+    }
+
+    // Helper methods for KPI calculations
+    private Long getNewCustomersThisMonth() {
+        LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
+        return customerRepository.countByCreatedAtAfter(startOfMonth.atStartOfDay());
+    }
+
+    private Double getCustomerRetentionRate() {
+        // Simplified calculation - in real scenario, this would be more complex
+        Long totalCustomers = customerRepository.count();
+        Long activeCustomers = customerRepository.count(); // Assuming all are active
+        return totalCustomers > 0 ? (activeCustomers.doubleValue() / totalCustomers.doubleValue()) * 100 : 0.0;
+    }
+
+    private Double getPaymentSuccessRate() {
+        // Simplified calculation
+        Long totalPayments = paymentRepository.count();
+        Long successfulPayments = paymentRepository.count(); // Assuming all are successful
+        return totalPayments > 0 ? (successfulPayments.doubleValue() / totalPayments.doubleValue()) * 100 : 0.0;
+    }
 }

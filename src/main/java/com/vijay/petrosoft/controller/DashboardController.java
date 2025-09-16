@@ -199,4 +199,23 @@ public class DashboardController {
         Map<String, Object> comparison = dashboardService.comparePumps(pumpIds, startDate, endDate);
         return new ResponseEntity<>(comparison, HttpStatus.OK);
     }
+
+    // Additional endpoints for comprehensive testing
+    @GetMapping("/overview")
+    public ResponseEntity<Map<String, Object>> getOverview() {
+        Map<String, Object> overview = dashboardService.getOverview();
+        return new ResponseEntity<>(overview, HttpStatus.OK);
+    }
+
+    @GetMapping("/metrics")
+    public ResponseEntity<Map<String, Object>> getMetrics() {
+        Map<String, Object> metrics = dashboardService.getMetrics();
+        return new ResponseEntity<>(metrics, HttpStatus.OK);
+    }
+
+    @GetMapping("/kpis")
+    public ResponseEntity<Map<String, Object>> getKPIs() {
+        Map<String, Object> kpis = dashboardService.getKPIs();
+        return new ResponseEntity<>(kpis, HttpStatus.OK);
+    }
 }

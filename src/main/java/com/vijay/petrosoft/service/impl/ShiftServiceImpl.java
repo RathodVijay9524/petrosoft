@@ -74,7 +74,7 @@ public class ShiftServiceImpl implements ShiftService {
     @Override
     public ShiftDTO openShift(Long pumpId, Long operatorId) {
         // Check if there's already an active shift for this pump
-        List<Shift> activeShifts = shiftRepository.findByPumpIdAndStatus(pumpId, "ACTIVE");
+        List<Shift> activeShifts = shiftRepository.findByPumpIdAndStatus(pumpId, Shift.Status.OPEN);
         if (!activeShifts.isEmpty()) {
             throw new RuntimeException("There is already an active shift for pump: " + pumpId);
         }
@@ -125,7 +125,7 @@ public class ShiftServiceImpl implements ShiftService {
     @Override
     @Transactional(readOnly = true)
     public List<ShiftDTO> getActiveShifts() {
-        return shiftRepository.findByStatus("ACTIVE").stream()
+        return shiftRepository.findByStatus(Shift.Status.OPEN).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -141,7 +141,7 @@ public class ShiftServiceImpl implements ShiftService {
     @Override
     @Transactional(readOnly = true)
     public ShiftDTO getCurrentShiftByPump(Long pumpId) {
-        List<Shift> activeShifts = shiftRepository.findByPumpIdAndStatus(pumpId, "ACTIVE");
+        List<Shift> activeShifts = shiftRepository.findByPumpIdAndStatus(pumpId, Shift.Status.OPEN);
         if (activeShifts.isEmpty()) {
             return null;
         }

@@ -40,7 +40,8 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(readOnly = true)
     public Optional<Role> getRoleByType(Role.RoleType roleType) {
-        return roleRepository.findByRoleType(roleType);
+        List<Role> roles = roleRepository.findByRoleType(roleType);
+        return roles.isEmpty() ? Optional.empty() : Optional.of(roles.get(0));
     }
 
     @Override

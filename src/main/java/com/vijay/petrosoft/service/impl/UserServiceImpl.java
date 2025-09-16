@@ -79,8 +79,11 @@ public class UserServiceImpl implements UserService {
         Role.RoleType roleType = registrationRequest.getRoleType() != null ? 
             registrationRequest.getRoleType() : Role.RoleType.OPERATOR;
         
-        Role role = roleRepository.findByRoleType(roleType)
-                .orElseThrow(() -> new RuntimeException("Role not found: " + roleType));
+        List<Role> roles = roleRepository.findByRoleType(roleType);
+        if (roles.isEmpty()) {
+            throw new RuntimeException("Role not found: " + roleType);
+        }
+        Role role = roles.get(0);
 
         Set<Role> userRoles = new HashSet<>();
         userRoles.add(role);

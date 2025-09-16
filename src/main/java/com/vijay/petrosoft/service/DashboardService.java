@@ -56,4 +56,9 @@ public interface DashboardService {
     Map<String, Object> comparePeriods(Long pumpId, LocalDate period1Start, LocalDate period1End, 
                                       LocalDate period2Start, LocalDate period2End);
     Map<String, Object> comparePumps(List<Long> pumpIds, LocalDate startDate, LocalDate endDate);
+    
+    // Additional methods for comprehensive testing
+    Map<String, Object> getOverview();
+    Map<String, Object> getMetrics();
+    Map<String, Object> getKPIs();
 }

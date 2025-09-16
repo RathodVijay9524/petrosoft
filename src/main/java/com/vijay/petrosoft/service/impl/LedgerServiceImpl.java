@@ -357,29 +357,29 @@ public class LedgerServiceImpl implements LedgerService {
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getTotalDebitByAccount(Long accountId) {
-        Double total = ledgerEntryRepository.sumAmountByAccountIdAndEntryType(accountId, LedgerEntry.EntryType.DEBIT);
-        return total != null ? BigDecimal.valueOf(total) : BigDecimal.ZERO;
+        BigDecimal total = ledgerEntryRepository.sumAmountByAccountIdAndEntryType(accountId, LedgerEntry.EntryType.DEBIT);
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getTotalCreditByAccount(Long accountId) {
-        Double total = ledgerEntryRepository.sumAmountByAccountIdAndEntryType(accountId, LedgerEntry.EntryType.CREDIT);
-        return total != null ? BigDecimal.valueOf(total) : BigDecimal.ZERO;
+        BigDecimal total = ledgerEntryRepository.sumCreditAmountByAccountIdAndEntryType(accountId, LedgerEntry.EntryType.CREDIT);
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getTotalDebitByAccountAndDateRange(Long accountId, LocalDate startDate, LocalDate endDate) {
-        Double total = ledgerEntryRepository.sumAmountByAccountIdAndEntryTypeAndDateRange(accountId, LedgerEntry.EntryType.DEBIT, startDate, endDate);
-        return total != null ? BigDecimal.valueOf(total) : BigDecimal.ZERO;
+        BigDecimal total = ledgerEntryRepository.sumAmountByAccountIdAndEntryTypeAndDateRange(accountId, LedgerEntry.EntryType.DEBIT, startDate, endDate);
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     @Override
     @Transactional(readOnly = true)
     public BigDecimal getTotalCreditByAccountAndDateRange(Long accountId, LocalDate startDate, LocalDate endDate) {
-        Double total = ledgerEntryRepository.sumAmountByAccountIdAndEntryTypeAndDateRange(accountId, LedgerEntry.EntryType.CREDIT, startDate, endDate);
-        return total != null ? BigDecimal.valueOf(total) : BigDecimal.ZERO;
+        BigDecimal total = ledgerEntryRepository.sumCreditAmountByAccountIdAndEntryTypeAndDateRange(accountId, LedgerEntry.EntryType.CREDIT, startDate, endDate);
+        return total != null ? total : BigDecimal.ZERO;
     }
 
     @Override
@@ -397,15 +397,15 @@ public class LedgerServiceImpl implements LedgerService {
     @Override
     @Transactional(readOnly = true)
     public Optional<LedgerEntryDTO> getLatestEntryByAccount(Long accountId) {
-        LedgerEntry entry = ledgerEntryRepository.findTopByAccountIdOrderByTransactionDateDesc(accountId);
-        return entry != null ? Optional.of(convertToDTO(entry)) : Optional.empty();
+        Optional<LedgerEntry> entry = ledgerEntryRepository.findTopByAccountIdOrderByTransactionDateDesc(accountId);
+        return entry.map(this::convertToDTO);
     }
 
     @Override
     @Transactional(readOnly = true)
     public Optional<LedgerEntryDTO> getLatestEntryByPumpId(Long pumpId) {
-        LedgerEntry entry = ledgerEntryRepository.findTopByPumpIdOrderByTransactionDateDesc(pumpId);
-        return entry != null ? Optional.of(convertToDTO(entry)) : Optional.empty();
+        Optional<LedgerEntry> entry = ledgerEntryRepository.findTopByPumpIdOrderByTransactionDateDesc(pumpId);
+        return entry.map(this::convertToDTO);
     }
 
     @Override
