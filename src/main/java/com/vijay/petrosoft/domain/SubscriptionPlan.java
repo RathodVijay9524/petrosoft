@@ -6,7 +6,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "subscription_plans")
-@Data @NoArgsConstructor @AllArgsConstructor @Builder
+@Data @NoArgsConstructor @AllArgsConstructor @Builder @EqualsAndHashCode(callSuper=false)
 public class SubscriptionPlan extends Auditable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
