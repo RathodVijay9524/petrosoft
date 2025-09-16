@@ -5,23 +5,31 @@ import com.vijay.petrosoft.domain.User;
 import com.vijay.petrosoft.dto.UserDTO;
 import com.vijay.petrosoft.exception.GlobalExceptionHandler.ResourceNotFoundException;
 import com.vijay.petrosoft.exception.GlobalExceptionHandler.DuplicateResourceException;
+import com.vijay.petrosoft.repository.RoleRepository;
 import com.vijay.petrosoft.repository.UserRepository;
+import com.vijay.petrosoft.service.RoleService;
 import com.vijay.petrosoft.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -38,9 +46,48 @@ public class UserServiceImpl implements UserService {
                 .phone(userDTO.getPhone())
                 .enabled(userDTO.isEnabled())
                 .pumpId(userDTO.getPumpId())
+                .roles(userDTO.getRoles())
                 .build();
 
         User savedUser = userRepository.save(user);
+        return convertToDTO(savedUser);
+    }
+
+    @Override
+    public UserDTO registerUser(UserDTO.RegistrationRequest registrationRequest) {
+        log.info("Registering new user: {}", registrationRequest.getUsername());
+        
+        if (isUsernameExists(registrationRequest.getUsername())) {
+            throw new DuplicateResourceException("Username already exists: " + registrationRequest.getUsername());
+        }
+
+        // Initialize default roles if they don't exist
+        roleService.initializeDefaultRoles();
+
+        // Get the role for the user
+        Role.RoleType roleType = registrationRequest.getRoleType() != null ? 
+            registrationRequest.getRoleType() : Role.RoleType.OPERATOR;
+        
+        Role role = roleRepository.findByRoleType(roleType)
+                .orElseThrow(() -> new RuntimeException("Role not found: " + roleType));
+
+        Set<Role> userRoles = new HashSet<>();
+        userRoles.add(role);
+
+        User user = User.builder()
+                .username(registrationRequest.getUsername())
+                .passwordHash(passwordEncoder.encode(registrationRequest.getPassword()))
+                .fullName(registrationRequest.getFullName())
+                .email(registrationRequest.getEmail())
+                .phone(registrationRequest.getPhone())
+                .enabled(true)
+                .pumpId(registrationRequest.getPumpId())
+                .roles(userRoles)
+                .build();
+
+        User savedUser = userRepository.save(user);
+        log.info("Successfully registered user: {} with role: {}", savedUser.getUsername(), roleType);
+        
         return convertToDTO(savedUser);
     }
 
@@ -144,6 +191,7 @@ public class UserServiceImpl implements UserService {
                 .phone(user.getPhone())
                 .enabled(user.isEnabled())
                 .pumpId(user.getPumpId())
+                .roles(user.getRoles())
                 .build();
     }
 }

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 public interface UserService {
     UserDTO createUser(UserDTO userDTO);
+    UserDTO registerUser(UserDTO.RegistrationRequest registrationRequest);
     UserDTO updateUser(Long id, UserDTO userDTO);
     Optional<UserDTO> getUserById(Long id);
     List<UserDTO> getAllUsers();

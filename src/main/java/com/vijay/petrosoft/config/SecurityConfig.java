@@ -45,7 +45,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/send-otp").permitAll()
                 .requestMatchers("/api/auth/verify-otp").permitAll()
                 .requestMatchers("/api/auth/forgot-password").permitAll()
-                .requestMatchers("/api/users/register").permitAll()
+                .requestMatchers("/api/auth/register").permitAll()
+                .requestMatchers("/api/auth/roles").permitAll()
                 .requestMatchers("/h2-console/**").permitAll()
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
