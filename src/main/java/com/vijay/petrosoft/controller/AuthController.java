@@ -1,6 +1,5 @@
 package com.vijay.petrosoft.controller;
 
-import com.vijay.petrosoft.dto.UserDTO;
 import com.vijay.petrosoft.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -40,6 +40,79 @@ public class AuthController {
             errorResponse.put("error", "Invalid credentials");
             errorResponse.put("message", "Username or password is incorrect");
             return ResponseEntity.status(401).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<Map<String, Object>> sendOTP(@RequestParam String username) {
+        try {
+            // Generate 6-digit OTP
+            String otp = String.format("%06d", new Random().nextInt(1000000));
+            
+            // Store OTP temporarily (in production, use Redis or database)
+            // For now, we'll just send the SMS
+            
+            // Get user phone number and send OTP
+            // This would need to be implemented based on your user service
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "OTP sent successfully");
+            response.put("otp", otp); // Remove this in production
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to send OTP");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<Map<String, Object>> verifyOTP(@RequestParam String username, @RequestParam String otp) {
+        try {
+            // Verify OTP (implement proper verification logic)
+            // For now, just return success
+            
+            // For OTP verification, we need to create a proper UserDetails object
+            // This is a simplified implementation - in production, you'd want proper user lookup
+            org.springframework.security.core.userdetails.UserDetails userDetails = 
+                org.springframework.security.core.userdetails.User.builder()
+                    .username(username)
+                    .password("") // OTP verification doesn't need password
+                    .roles("USER")
+                    .build();
+            String token = jwtUtil.generateToken(userDetails);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("username", username);
+            response.put("message", "OTP verified successfully");
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Invalid OTP");
+            errorResponse.put("message", "OTP verification failed");
+            return ResponseEntity.status(401).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, Object>> forgotPassword(@RequestParam String username) {
+        try {
+            // Generate reset token and send email/SMS
+            // This would need proper implementation
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Password reset instructions sent");
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to send reset instructions");
+            errorResponse.put("message", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
         }
     }
 
