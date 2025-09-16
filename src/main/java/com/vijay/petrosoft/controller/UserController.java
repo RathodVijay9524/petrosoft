@@ -2,6 +2,15 @@ package com.vijay.petrosoft.controller;
 
 import com.vijay.petrosoft.dto.UserDTO;
 import com.vijay.petrosoft.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +31,96 @@ import java.util.Optional;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "User Management", description = "Comprehensive user management operations including CRUD, authentication, and profile management")
+@SecurityRequirement(name = "Bearer Authentication")
 public class UserController {
 
     private final UserService userService;
 
     // Basic CRUD Operations
     @GetMapping
+    @Operation(
+            summary = "Get all users",
+            description = "Retrieve a list of all users in the system. Requires authentication and appropriate role permissions.",
+            operationId = "getAllUsers"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully retrieved all users",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = UserDTO.class),
+                            examples = @ExampleObject(
+                                    name = "Success Response",
+                                    value = """
+                                            [
+                                                {
+                                                    "id": 1,
+                                                    "username": "admin",
+                                                    "fullName": "System Administrator",
+                                                    "email": "admin@petrosoft.com",
+                                                    "phone": "+1234567890",
+                                                    "enabled": true,
+                                                    "roles": [{"roleType": "OWNER"}],
+                                                    "pumpId": 1,
+                                                    "isActive": true,
+                                                    "hasProfileImage": false
+                                                }
+                                            ]
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Unauthorized - Invalid or missing authentication token",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Unauthorized",
+                                    value = """
+                                            {
+                                                "error": "Unauthorized",
+                                                "message": "Invalid or missing authentication token"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden - Insufficient permissions",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Forbidden",
+                                    value = """
+                                            {
+                                                "error": "Forbidden",
+                                                "message": "Insufficient permissions to access user data"
+                                            }
+                                            """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Server Error",
+                                    value = """
+                                            {
+                                                "error": "Internal Server Error",
+                                                "message": "An unexpected error occurred while retrieving users"
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         try {
             List<UserDTO> users = userService.getAllUsers();
