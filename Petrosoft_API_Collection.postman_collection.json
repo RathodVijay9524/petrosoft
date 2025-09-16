@@ -1,0 +1,662 @@
+{
+  "info": {
+    "name": "Petrosoft API Collection",
+    "description": "Comprehensive API collection for Petrosoft application testing",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8081/api",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@petrosoft.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('auth_token', response.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"test123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"roleType\": \"OPERATOR\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/dashboard/overview",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "overview"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/dashboard/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "metrics"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Dashboard KPIs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/dashboard/kpis",
+              "host": ["{{base_url}}"],
+              "path": ["dashboard", "kpis"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sales Management",
+      "item": [
+        {
+          "name": "Get All Sales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sales",
+              "host": ["{{base_url}}"],
+              "path": ["sales"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Sales Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerId\": 1,\n  \"pumpId\": 1,\n  \"operatorId\": 2,\n  \"fuelType\": \"PETROL\",\n  \"quantity\": 50.0,\n  \"pricePerLiter\": 95.50,\n  \"totalAmount\": 4775.00,\n  \"paymentMethod\": \"CASH\",\n  \"vehicleNumber\": \"KA01AB1234\",\n  \"notes\": \"Regular customer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/sales",
+              "host": ["{{base_url}}"],
+              "path": ["sales"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sales by Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sales?startDate=2024-09-01&endDate=2024-09-17",
+              "host": ["{{base_url}}"],
+              "path": ["sales"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-09-17"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Sales Revenue Trends",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/sales/revenue-trends?startDate=2024-09-01&endDate=2024-09-17",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "sales", "revenue-trends"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-09-17"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Customer Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/customers/behavior",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "customers", "behavior"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Financial Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/financial/revenue-metrics?startDate=2024-09-01&endDate=2024-09-17",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "financial", "revenue-metrics"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-09-17"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Employee Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/employees/performance",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "employees", "performance"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Vendor Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/analytics/vendors/performance",
+              "host": ["{{base_url}}"],
+              "path": ["analytics", "vendors", "performance"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Business Intelligence",
+      "item": [
+        {
+          "name": "Revenue Trends",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/bi/revenue-trends?startDate=2024-09-01&endDate=2024-09-17&period=monthly",
+              "host": ["{{base_url}}"],
+              "path": ["bi", "revenue-trends"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-09-17"
+                },
+                {
+                  "key": "period",
+                  "value": "monthly"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Customer Insights",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/bi/customer-insights",
+              "host": ["{{base_url}}"],
+              "path": ["bi", "customer-insights"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Performance Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/bi/performance-metrics",
+              "host": ["{{base_url}}"],
+              "path": ["bi", "performance-metrics"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Operational Efficiency",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/bi/operational-efficiency",
+              "host": ["{{base_url}}"],
+              "path": ["bi", "operational-efficiency"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Sales Forecasting",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/bi/sales-forecasting?months=6",
+              "host": ["{{base_url}}"],
+              "path": ["bi", "sales-forecasting"],
+              "query": [
+                {
+                  "key": "months",
+                  "value": "6"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Data Export",
+      "item": [
+        {
+          "name": "Export Sales Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/export/sales?startDate=2024-09-01&endDate=2024-09-17",
+              "host": ["{{base_url}}"],
+              "path": ["export", "sales"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-09-17"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Export Customer Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/export/customers",
+              "host": ["{{base_url}}"],
+              "path": ["export", "customers"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Export Financial Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/export/financial?startDate=2024-09-01&endDate=2024-09-17",
+              "host": ["{{base_url}}"],
+              "path": ["export", "financial"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-09-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-09-17"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Export Reports - Sales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/export/reports/sales",
+              "host": ["{{base_url}}"],
+              "path": ["export", "reports", "sales"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Export Reports - Financial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/export/reports/financial",
+              "host": ["{{base_url}}"],
+              "path": ["export", "reports", "financial"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Export Reports - Performance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/export/reports/performance",
+              "host": ["{{base_url}}"],
+              "path": ["export", "reports", "performance"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Master Data",
+      "item": [
+        {
+          "name": "Get All Customers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/customers",
+              "host": ["{{base_url}}"],
+              "path": ["customers"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Employees",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/employees",
+              "host": ["{{base_url}}"],
+              "path": ["employees"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Vendors",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/vendors",
+              "host": ["{{base_url}}"],
+              "path": ["vendors"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/payments",
+              "host": ["{{base_url}}"],
+              "path": ["payments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Shifts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/shifts",
+              "host": ["{{base_url}}"],
+              "path": ["shifts"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sample Data",
+      "item": [
+        {
+          "name": "Create Sample Data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/sample-data/create",
+              "host": ["{{base_url}}"],
+              "path": ["sample-data", "create"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sample Data Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/sample-data/status",
+              "host": ["{{base_url}}"],
+              "path": ["sample-data", "status"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "System Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/../actuator/health",
+              "host": ["{{base_url}}"],
+              "path": ["..", "actuator", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "System Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/../actuator/info",
+              "host": ["{{base_url}}"],
+              "path": ["..", "actuator", "info"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "API Documentation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/../swagger-ui.html",
+              "host": ["{{base_url}}"],
+              "path": ["..", "swagger-ui.html"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set request timestamp",
+          "pm.globals.set('request_timestamp', new Date().toISOString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Log response time",
+          "pm.test('Response time is less than 5000ms', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "// Log response status",
+          "console.log('Response Status:', pm.response.status);",
+          "console.log('Response Time:', pm.response.responseTime + 'ms');"
+        ]
+      }
+    }
+  ]
+}
