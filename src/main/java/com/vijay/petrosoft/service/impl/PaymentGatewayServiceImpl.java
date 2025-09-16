@@ -38,14 +38,18 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
     public PaymentGatewayDTO createPaymentOrder(PaymentGatewayDTO paymentGatewayDTO) {
         try {
             JSONObject orderRequest = new JSONObject();
-            orderRequest.put("amount", paymentGatewayDTO.getAmount().multiply(BigDecimal.valueOf(100)).intValue()); // Convert to paise
-            orderRequest.put("currency", paymentGatewayDTO.getCurrency());
-            orderRequest.put("receipt", "order_" + System.currentTimeMillis());
-            orderRequest.put("notes", Map.of(
-                "subscription_id", paymentGatewayDTO.getSubscriptionId(),
-                "customer_name", paymentGatewayDTO.getCustomerName(),
-                "description", paymentGatewayDTO.getDescription()
-            ));
+            try {
+                orderRequest.put("amount", paymentGatewayDTO.getAmount().multiply(BigDecimal.valueOf(100)).intValue()); // Convert to paise
+                orderRequest.put("currency", paymentGatewayDTO.getCurrency());
+                orderRequest.put("receipt", "order_" + System.currentTimeMillis());
+                orderRequest.put("notes", Map.of(
+                    "subscription_id", paymentGatewayDTO.getSubscriptionId(),
+                    "customer_name", paymentGatewayDTO.getCustomerName(),
+                    "description", paymentGatewayDTO.getDescription()
+                ));
+            } catch (org.json.JSONException e) {
+                throw new RuntimeException("Error creating order request", e);
+            }
 
             Order order = razorpayClient.orders.create(orderRequest);
             
@@ -131,8 +135,12 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
     public PaymentGatewayDTO capturePayment(String paymentId, BigDecimal amount) {
         try {
             JSONObject captureRequest = new JSONObject();
-            captureRequest.put("amount", amount.multiply(BigDecimal.valueOf(100)).intValue());
-            captureRequest.put("currency", "INR");
+            try {
+                captureRequest.put("amount", amount.multiply(BigDecimal.valueOf(100)).intValue());
+                captureRequest.put("currency", "INR");
+            } catch (org.json.JSONException e) {
+                throw new RuntimeException("Error creating capture request", e);
+            }
 
             Payment payment = razorpayClient.payments.capture(paymentId, captureRequest);
             
@@ -189,8 +197,12 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
     public PaymentGatewayDTO processRefund(String paymentId, BigDecimal amount, String reason) {
         try {
             JSONObject refundRequest = new JSONObject();
-            refundRequest.put("amount", amount.multiply(BigDecimal.valueOf(100)).intValue());
-            refundRequest.put("notes", Map.of("reason", reason));
+            try {
+                refundRequest.put("amount", amount.multiply(BigDecimal.valueOf(100)).intValue());
+                refundRequest.put("notes", Map.of("reason", reason));
+            } catch (org.json.JSONException e) {
+                throw new RuntimeException("Error creating refund request", e);
+            }
 
             Refund refund = razorpayClient.payments.refund(paymentId, refundRequest);
             
@@ -299,9 +311,13 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
     public Map<String, Object> createCustomer(String email, String phone, String name) {
         try {
             JSONObject customerRequest = new JSONObject();
-            customerRequest.put("name", name);
-            customerRequest.put("email", email);
-            customerRequest.put("contact", phone);
+            try {
+                customerRequest.put("name", name);
+                customerRequest.put("email", email);
+                customerRequest.put("contact", phone);
+            } catch (org.json.JSONException e) {
+                throw new RuntimeException("Error creating customer request", e);
+            }
 
             Customer customer = razorpayClient.customers.create(customerRequest);
             
@@ -395,14 +411,18 @@ public class PaymentGatewayServiceImpl implements PaymentGatewayService {
     public Map<String, Object> generatePaymentLink(PaymentGatewayDTO paymentGatewayDTO) {
         try {
             JSONObject linkRequest = new JSONObject();
-            linkRequest.put("amount", paymentGatewayDTO.getAmount().multiply(BigDecimal.valueOf(100)).intValue());
-            linkRequest.put("currency", paymentGatewayDTO.getCurrency());
-            linkRequest.put("description", paymentGatewayDTO.getDescription());
-            linkRequest.put("customer", Map.of(
-                "name", paymentGatewayDTO.getCustomerName(),
-                "email", paymentGatewayDTO.getCustomerEmail(),
-                "contact", paymentGatewayDTO.getCustomerPhone()
-            ));
+            try {
+                linkRequest.put("amount", paymentGatewayDTO.getAmount().multiply(BigDecimal.valueOf(100)).intValue());
+                linkRequest.put("currency", paymentGatewayDTO.getCurrency());
+                linkRequest.put("description", paymentGatewayDTO.getDescription());
+                linkRequest.put("customer", Map.of(
+                    "name", paymentGatewayDTO.getCustomerName(),
+                    "email", paymentGatewayDTO.getCustomerEmail(),
+                    "contact", paymentGatewayDTO.getCustomerPhone()
+                ));
+            } catch (org.json.JSONException e) {
+                throw new RuntimeException("Error creating payment link request", e);
+            }
 
             PaymentLink paymentLink = razorpayClient.paymentLink.create(linkRequest);
             

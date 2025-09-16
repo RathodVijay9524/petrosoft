@@ -143,6 +143,28 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-aop</artifactId>
 		</dependency>
+		
+		<!-- Performance Testing Dependencies -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+		</dependency>
+		
+		<!-- Security Testing Dependencies -->
+		<dependency>
+			<groupId>org.owasp</groupId>
+			<artifactId>dependency-check-maven</artifactId>
+			<version>8.4.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- HTTP Client for Security Testing -->
+		<dependency>
+			<groupId>org.apache.httpcomponents.client5</groupId>
+			<artifactId>httpclient5</artifactId>
+			<version>5.2.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
