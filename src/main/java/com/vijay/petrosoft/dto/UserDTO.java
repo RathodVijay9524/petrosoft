@@ -1,11 +1,15 @@
 package com.vijay.petrosoft.dto;
 
 import com.vijay.petrosoft.domain.Role;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -14,45 +18,112 @@ import java.util.Set;
 @Builder
 public class UserDTO {
     private Long id;
+    
+    @NotBlank(message = "Username cannot be empty")
     private String username;
-    private String password;
+    
+    private String password; // Only for registration/update, not returned in responses
+    
     private String fullName;
+    
+    @Email(message = "Invalid email format")
     private String email;
+    
     private String phone;
     private boolean enabled;
     private Set<Role> roles;
     private Long pumpId;
     
+    // Profile image fields
+    private String profileImageUrl;
+    private byte[] profileImageData;
+    private String imageContentType;
+    private boolean hasProfileImage;
+    
+    // Additional user information
+    private LocalDate dateOfBirth;
+    private String address;
+    private String city;
+    private String state;
+    private String pincode;
+    private String emergencyContact;
+    private String emergencyContactName;
+    private LocalDate joiningDate;
+    private java.time.LocalDateTime lastLogin;
+    private Integer loginAttempts;
+    private boolean accountLocked;
+    private boolean isActive;
+    
     // For registration
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class RegistrationRequest {
+        @NotBlank(message = "Username cannot be empty")
         private String username;
+        
+        @NotBlank(message = "Password cannot be empty")
+        @Size(min = 6, message = "Password must be at least 6 characters long")
         private String password;
+        
         private String fullName;
+        
+        @Email(message = "Invalid email format")
         private String email;
+        
         private String phone;
         private Long pumpId;
         private Role.RoleType roleType;
-
-        // Getters and setters
-        public String getUsername() { return username; }
-        public void setUsername(String username) { this.username = username; }
         
-        public String getPassword() { return password; }
-        public void setPassword(String password) { this.password = password; }
+        // Additional fields for registration
+        private LocalDate dateOfBirth;
+        private String address;
+        private String city;
+        private String state;
+        private String pincode;
+        private String emergencyContact;
+        private String emergencyContactName;
+        private LocalDate joiningDate;
+    }
+    
+    // For user update
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class UpdateRequest {
+        private String fullName;
+        private String email;
+        private String phone;
+        private boolean enabled;
+        private Long pumpId;
         
-        public String getFullName() { return fullName; }
-        public void setFullName(String fullName) { this.fullName = fullName; }
+        // Profile image
+        private String profileImageUrl;
+        private byte[] profileImageData;
+        private String imageContentType;
         
-        public String getEmail() { return email; }
-        public void setEmail(String email) { this.email = email; }
+        // Additional user information
+        private LocalDate dateOfBirth;
+        private String address;
+        private String city;
+        private String state;
+        private String pincode;
+        private String emergencyContact;
+        private String emergencyContactName;
+    }
+    
+    // For password change
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PasswordChangeRequest {
+        @NotBlank(message = "Current password cannot be empty")
+        private String currentPassword;
         
-        public String getPhone() { return phone; }
-        public void setPhone(String phone) { this.phone = phone; }
-        
-        public Long getPumpId() { return pumpId; }
-        public void setPumpId(Long pumpId) { this.pumpId = pumpId; }
-        
-        public Role.RoleType getRoleType() { return roleType; }
-        public void setRoleType(Role.RoleType roleType) { this.roleType = roleType; }
+        @NotBlank(message = "New password cannot be empty")
+        @Size(min = 6, message = "New password must be at least 6 characters long")
+        private String newPassword;
     }
 }
